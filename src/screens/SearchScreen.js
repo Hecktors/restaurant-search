@@ -1,17 +1,27 @@
 import React, { useState } from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View, Text, StyleSheet, FlatList } from "react-native"
 import SearchBar from "../components/SearchBar"
+import yelp from "../api/yelp"
 
 const SearchScreen = () => {
-  const [searchTerm, setSearchTerm] = useState("")
-  console.log(searchTerm)
+  const [term, setTerm] = useState("")
+  const [restaurants, setRestaurants] = useState([])
+
+  const searchAPI = async () => {
+    const response = await yelp("search", {
+      params: {
+        term,
+        location: "NYC",
+        limit: 50,
+      },
+    })
+    setRestaurants(response.data.businesses)
+  }
+
   return (
     <View>
-      <SearchBar
-        searchTerm={searchTerm}
-        onChange={(newSearchTerm) => setSearchTerm(newSearchTerm)}
-        onSubmit={() => console.log("term was submitted")}
-      />
+      <SearchBar term={term} onChange={(newTerm) => setTerm(newTerm)} onSubmit={searchAPI} />
+      <Text>We have found {restaurants.length} restaurants</Text>
     </View>
   )
 }
